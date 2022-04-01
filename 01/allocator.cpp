@@ -1,12 +1,18 @@
 #include <iostream>
-#include "allocator.h"
+#include "allocator.hpp"
 
 Allocator::Allocator(): ptr_{nullptr}, ptrFirst_{nullptr}, ptrEnd_{nullptr} 
 {}
 
 void Allocator::makeAllocator(size_t maxSize)
 {
-	if (ptr_)
+	while (!maxSize)
+	{
+		std::cout << "maxSize must be greater than 0\n";
+		std::cout << "input new value\n";
+		std::cin >> maxSize;
+	}
+	if (ptrFirst_)
 	{
 		delete[] ptrFirst_;
 	}
@@ -17,7 +23,7 @@ void Allocator::makeAllocator(size_t maxSize)
 
 char * Allocator::alloc(size_t size)
 {
-	if (!ptr_)
+	if (!ptr_ or !size)
 		return nullptr;
 	if (ptr_ + size <= ptrEnd_)
 	{

@@ -8,7 +8,7 @@ all: main test
 main: main.cpp allocator.o
 	$(CC) $(FLAGS) allocator.o main.cpp -o main
 
-allocator.o: allocator.cpp allocator.h
+allocator.o: allocator.cpp allocator.hpp
 	$(CC) $(FLAGS) allocator.cpp -c
 
 test: allocator.o test.cpp

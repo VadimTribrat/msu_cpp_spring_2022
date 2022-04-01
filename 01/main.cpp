@@ -1,10 +1,10 @@
 #include <iostream>
-#include "allocator.h"
+#include "allocator.hpp"
 
 int main()
 {
 	Allocator allocator = Allocator();
-	allocator.makeAllocator(15);
+	allocator.makeAllocator(0);
 	char * ptr = allocator.alloc(10);
 	std::cout << (ptr == nullptr) << "\n";
 	ptr = allocator.alloc(10);
