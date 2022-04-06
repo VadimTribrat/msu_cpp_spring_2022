@@ -1,11 +1,13 @@
-#include "parser.hpp"
-#include <string>
 #include <iostream>
+#include "allocator.hpp"
 
 int main()
 {
-    std::string line;
-    getline(std::cin, line);
-    parser(line);
-    return 0;
+	Allocator allocator = Allocator();
+	allocator.makeAllocator(0);
+	char * ptr = allocator.alloc(10);
+	std::cout << (ptr == nullptr) << "\n";
+	ptr = allocator.alloc(10);
+	std::cout << (ptr == nullptr) << "\n";
+	return 0;
 }
