@@ -1,80 +1,41 @@
+
 #include <gtest/gtest.h>
-#include "allocator.hpp"
+#include <iostream>
+#include <string>
+#include "parser.hpp"
 
 class TestFoo : public ::testing::Test
 {
-protected:
-	void SetUp()
-	{
-		allocator = new Allocator();
-	}
-	void TearDowm()
-	{
-		delete allocator;
-	}
-	Allocator * allocator;
 };
 
-TEST_F(TestFoo, testAlloc1)
+void numFu(int i)
 {
-	allocator->makeAllocator(15);
-	ASSERT_NE(allocator->alloc(5), nullptr);
-	ASSERT_NE(allocator->alloc(10), nullptr);
-	ASSERT_EQ(allocator->alloc(1), nullptr);
-	allocator->reset();
-	ASSERT_NE(allocator->alloc(15), nullptr);
-	ASSERT_EQ(allocator->alloc(1), nullptr);
+    std::cout << "Digit: " << i << "\n";
 }
 
-TEST_F(TestFoo, testAlloc2)
+void strFu(const std::string& str)
 {
-	ASSERT_EQ(allocator->alloc(5), nullptr);
-	allocator->makeAllocator(2);
-	ASSERT_EQ(allocator->alloc(5), nullptr);
-	ASSERT_NE(allocator->alloc(1), nullptr);
-	ASSERT_NE(allocator->alloc(1), nullptr);
-	ASSERT_EQ(allocator->alloc(1), nullptr);
+    std::cout << "String " << str << "\n";
 }
 
-TEST_F(TestFoo, testMakeAllocator1)
+void before()
 {
-	ASSERT_EQ(allocator->alloc(5), nullptr);
-	allocator->makeAllocator(5);
-	ASSERT_NE(allocator->alloc(5), nullptr);
-	ASSERT_EQ(allocator->alloc(1), nullptr);
-	allocator->makeAllocator(6);
-	ASSERT_NE(allocator->alloc(5), nullptr);
-	ASSERT_NE(allocator->alloc(1), nullptr);
-	ASSERT_EQ(allocator->alloc(1), nullptr);
+	std::cout << "Start\n";
 }
 
-TEST_F(TestFoo, testMakeAllocator2)
+void after()
 {
-	allocator->makeAllocator(1);
-	ASSERT_NE(allocator->alloc(1), nullptr);
-	ASSERT_EQ(allocator->alloc(1), nullptr);
-	allocator->makeAllocator(50);
-	ASSERT_NE(allocator->alloc(20), nullptr);
-	ASSERT_NE(allocator->alloc(30), nullptr);
-	ASSERT_EQ(allocator->alloc(1), nullptr);
-	allocator->reset();
-	ASSERT_NE(allocator->alloc(50), nullptr);	
+	std::cout << "End\n";
 }
 
-TEST_F(TestFoo, testPointers)
+TEST_F(TestFoo, test1)
 {
-	allocator->makeAllocator(20);
-	char* p1 = allocator->alloc(5);
-	char* p2 = allocator->alloc(10);
-	ptrdiff_t diff = p2 - p1;
-	ASSERT_EQ(diff, 5);
-	p2 = allocator->alloc(5);
-	diff = p2 - p1;
-	ASSERT_EQ(diff, 15);
-	allocator->reset();
-	p2 = allocator->alloc(10);
-	diff = p2 - p1;
-	ASSERT_EQ(diff, 0);
+	callbackOnNum(numFu);
+    callbackOnStr(strFu);
+    callbackOnStart(before);
+    callbackOnEnd(after);
+    std::string str = "akd_ad   u89 1982 900 sfgk";
+    parser(str);
 }
 
 int main(int argc, char ** argv)

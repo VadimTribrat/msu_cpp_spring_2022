@@ -3,9 +3,13 @@
 
 onNumber numHandler = nullptr;
 onStr strHandler = nullptr;
+func before = nullptr;
+func after = nullptr;
 
 void parser(const std::string & str)
 {
+	if (before)
+		before();
     if (!str.empty())
     {
         for (size_t i = 0; i < str.length(); ++i)
@@ -24,7 +28,7 @@ void parser(const std::string & str)
 					break;
 			}
             i = j;
-            if (word[0]>'0' && word[0]<'9')
+            if (word[0]>='0' && word[0]<='9')
             {
                 if (numHandler)
 				    numHandler(atoi(word.c_str()));
@@ -36,6 +40,8 @@ void parser(const std::string & str)
             }
         }
     }
+    if (after)
+		after();
 }
 
 void callbackOnNum(onNumber func)
@@ -46,4 +52,14 @@ void callbackOnNum(onNumber func)
 void callbackOnStr(onStr func)
 {
     strHandler = func;
+}
+
+void callbackOnStart(func f)
+{
+	before = f;
+}
+
+void callbackOnEnd(func f)
+{
+	after = f;
 }
