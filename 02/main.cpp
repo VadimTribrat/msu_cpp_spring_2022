@@ -2,7 +2,7 @@
 #include <string>
 #include <iostream>
 
-void numFu(int i)
+void numFu(unsigned long i)
 {
     std::cout << "Digit: " << i << "\n";
 }
@@ -24,12 +24,13 @@ void after()
 
 int main()
 {
-	callbackOnNum(numFu);
-    callbackOnStr(strFu);
-    callbackOnStart(before);
-    callbackOnEnd(after);
+    TokenParser tp;
+	tp.SetDigitTokenCallback(numFu);
+    tp.SetStringCallback(strFu);
+    tp.SetStartCallback(before);
+    tp.SetEndCallback(after);
     std::string line;
     getline(std::cin, line);
-    parser(line);
+    tp.Parse(line);
     return 0;
 }

@@ -1,15 +1,35 @@
 #include "parser.hpp"
 #include <iostream>
+#include <cstdlib>
 
-onNumber numHandler = nullptr;
-onStr strHandler = nullptr;
-func before = nullptr;
-func after = nullptr;
 
-void parser(const std::string & str)
+void TokenParser::SetDigitTokenCallback(onNumber func)
+{
+    numHandler = func;
+}
+
+void TokenParser::SetStringCallback(onStr func)
+{
+    strHandler = func;
+}
+
+void TokenParser::SetStartCallback(func f)
+{
+	before = f;
+}
+
+void TokenParser::SetEndCallback(func f)
+{
+	after = f;
+}
+
+void TokenParser::Parse(const std::string& str)
 {
 	if (before)
+    {
 		before();
+        forTest.push_back(std::string("Start"));
+    }
     if (!str.empty())
     {
         for (size_t i = 0; i < str.length(); ++i)
@@ -28,38 +48,46 @@ void parser(const std::string & str)
 					break;
 			}
             i = j;
-            if (word[0]>='0' && word[0]<='9')
+            unsigned long digit;
+            bool isTrue = true;
+            for (auto val: word)
             {
-                if (numHandler)
-				    numHandler(atoi(word.c_str()));
+                if (!isTrue)
+                    break;
+                isTrue = std::isdigit(val);
+            }
+            if (isTrue)
+            {
+                digit = strtoul(word.c_str(), nullptr, 10);
+                if (numHandler && digit && (errno != ERANGE))
+                {
+				    numHandler(digit);
+                    forTest.push_back(std::string("Dig:") + word);
+                }
+                else
+                {
+                    if (strHandler)
+                    {
+                        strHandler(word);
+                        forTest.push_back(std::string("Str:") + word);
+                    }
+
+                }
+                
             }
 			else	
             {
                 if (strHandler)	
+                {
 				    strHandler(word);
+                    forTest.push_back(std::string("Str:") + word);
+                }
             }
         }
     }
     if (after)
+    {
+        forTest.push_back(std::string("End"));
 		after();
-}
-
-void callbackOnNum(onNumber func)
-{
-    numHandler = func;
-}
-
-void callbackOnStr(onStr func)
-{
-    strHandler = func;
-}
-
-void callbackOnStart(func f)
-{
-	before = f;
-}
-
-void callbackOnEnd(func f)
-{
-	after = f;
+    }
 }
