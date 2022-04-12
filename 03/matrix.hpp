@@ -1,5 +1,7 @@
 #pragma once
 #include <iostream>
+#include <ostream>
+#include <cstddef>
 
 class Matrix
 {
@@ -8,7 +10,8 @@ class Matrix
 public:
     class Proxy
     {
-        int * row, colNum;
+        int * row;
+        size_t colNum;
     public:
         Proxy(int * const, size_t);
         int& operator[](size_t);
@@ -17,7 +20,7 @@ public:
     };
     Matrix(size_t, size_t);
     ~Matrix();
-    size_t getRows():
+    size_t getRows();
     size_t getColumns();
     Matrix& operator*=(int);
     bool operator==(const Matrix&);
@@ -25,4 +28,5 @@ public:
     Matrix operator+(const Matrix&);
     Matrix(const Matrix&);
     Proxy operator[](size_t);    
+    friend std::ostream& operator<<(std::ostream&, const Matrix&);
 };

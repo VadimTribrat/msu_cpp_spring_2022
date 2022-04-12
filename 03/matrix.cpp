@@ -2,6 +2,8 @@
 
 Matrix::Matrix(size_t row, size_t col)
 {
+    if (row == 0 || col == 0)
+        throw std::exception();
     rowNum = row;
     colNum = col;
     mat = new int *[rowNum];
@@ -42,10 +44,10 @@ Matrix& Matrix::operator*=(int mul)
 bool Matrix::operator==(const Matrix& other)
 {
     if (this->colNum != other.colNum || this->rowNum != other.rowNum)
-        throw std::exception();
+        throw std::length_error("Inequal sizes");
     for (size_t i = 0; i < rowNum; ++i)
         for (size_t j = 0; j < colNum; ++j)
-            if (mat[i][j] != other[i][j])
+            if (mat[i][j] != other.mat[i][j])
                 return false;
     return true;
 }
@@ -53,18 +55,18 @@ bool Matrix::operator==(const Matrix& other)
 bool Matrix::operator!=(const Matrix& other)
 {
     if (this->colNum != other.colNum || this->rowNum != other.rowNum)
-        throw std::exception();
+        throw std::length_error("Inequal sizes");
     return !(*this == other);
 }
 
-bool Matrix::operator+(const Matrix& other)
+Matrix Matrix::operator+(const Matrix& other)
 {
     if (this->colNum != other.colNum || this->rowNum != other.rowNum)
-        throw std::exception();
-    Matrix temp(rowNum, colNum):
+        throw std::length_error("Inequal sizes");
+    Matrix temp(rowNum, colNum);
     for (size_t i = 0; i < rowNum; ++i)
         for (size_t j = 0; j < colNum; ++j)
-            temp[i][j] = mat[i][j] + other[i][j];
+            temp[i][j] = mat[i][j] + other.mat[i][j];
     return temp;
 }
 
@@ -79,10 +81,12 @@ Matrix::Matrix(const Matrix& other)
     }
     for (size_t i = 0; i < rowNum; ++i)
         for (size_t j = 0; j < colNum; ++j)
-            mat[i][j] = other[i][j];    
+            mat[i][j] = other.mat[i][j];    
 }
 Matrix::Proxy Matrix::operator[](size_t i)
 {
+    if (i >= rowNum)
+        throw std::out_of_range("out og range");
     return Matrix::Proxy(mat[i], colNum);
 }
 
@@ -105,5 +109,18 @@ Matrix::Proxy::~Proxy()
 
 int& Matrix::Proxy::operator[](size_t i)
 {
+    if (i >= colNum)
+        throw std::out_of_range("out of range");
     return row[i];
+}
+
+std::ostream& operator<<(std::ostream& os, const Matrix& m)
+{
+    for (size_t i = 0; i < m.rowNum; ++i)
+    {
+        for (size_t j = 0; j < m.colNum; ++j)
+            os << m.mat[i][j] << " ";
+        os << "\n";
+    }
+    return os;
 }
