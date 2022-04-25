@@ -18,7 +18,7 @@ public:
         ~Proxy();
         Proxy(const Proxy&);
     };
-    Matrix(size_t, size_t);
+    Matrix(int, int);
     ~Matrix();
     size_t getRows();
     size_t getColumns();

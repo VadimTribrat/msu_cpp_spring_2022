@@ -1,15 +1,19 @@
 #include "matrix.hpp"
 
-Matrix::Matrix(size_t row, size_t col)
+Matrix::Matrix(int row, int col)
 {
-    if (row == 0 || col == 0)
+    if (row <= 0 || col <= 0)
         throw std::exception();
-    rowNum = row;
-    colNum = col;
+    rowNum = static_cast<size_t>(row);
+    colNum = static_cast<size_t>(col);
     mat = new int *[rowNum];
     for (size_t i = 0; i < rowNum; ++i)
     {
         mat[i] = new int[colNum];
+        if (mat[i] == nullptr)
+        {
+            throw std::exception();
+        }
     }
     for (size_t i = 0; i < rowNum; ++i)
         for (size_t j = 0; j < colNum; ++j)
