@@ -8,14 +8,15 @@
 
 class Deserializer
 {
+	static const std::string maxVal;
 	std::stringstream & in_;
 	static constexpr char Separator = ' ';
-	public:
-	Deserializer(std::stringstream &);
 	Error process(bool&);
 	Error process(uint64_t&);
 	template <class T, class... ArgT>
 	Error process(T&& t, ArgT&&...);
+public:
+	Deserializer(std::stringstream &);
 	template <class T>
 	Error load(T & t);
 	template <class... ArgT>
@@ -26,7 +27,7 @@ template <class T, class... ArgT>
 Error Deserializer::process(T&& t, ArgT&&... args)
 {
 	if (process(std::forward<T>(t)) == Error::NoError)
-		process(std::forward<ArgT>(args)...);
+		return process(std::forward<ArgT>(args)...);
 	return Error::CorruptedArchive;
 }
 

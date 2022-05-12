@@ -30,7 +30,7 @@ Error Serializer::process(T&& arg, ArgsT&&... args)
 {
     if (process(std::forward<T>(arg)) == Error::NoError)
         return process(std::forward<ArgsT>(args)...);
-    return Error::NoError;
+    return Error::CorruptedArchive;
 }
 
 template <class... ArgsT>
