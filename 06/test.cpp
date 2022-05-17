@@ -6,7 +6,7 @@
 #include <vector>
 #include <sstream>
 #include <type_traits>
-#include "format.cpp"
+#include "format.hpp"
 
 class TestFoo : public ::testing::Test
 {
@@ -16,8 +16,32 @@ TEST_F(TestFoo, test1)
 {
 	auto text = format("{1}+{1} = {0}", 2, "one");
 	ASSERT_TRUE(text == "one+one = 2");
-	ASSERT_ANY_THROW(format("{0}, {1}, {3}", 1, 2));
-	ASSERT_ANY_THROW(format("{0}, {1} {", 1, 2));
+	EXPECT_THROW(
+		try
+		{
+			format("{0}, {1}, {3}", 1, 2);
+		}
+		catch(const MyException& e)
+		{
+			EXPECT_STREQ(e.what(), "Not enough arguments\n");
+			throw;
+		},
+		MyException
+		
+	);
+	EXPECT_THROW(
+		try
+		{
+			format("{0}, {1} {", 1, 2);
+		}
+		catch(const MyException& e)
+		{
+			EXPECT_STREQ(e.what(), "Unbalanced number of brackets\n");
+			throw;
+		},
+		MyException
+		
+	);
 	ASSERT_TRUE(format("{0}, {1}, {0}, {2}", false, 1, "abc") == "0, 1, 0, abc");
 }
 
@@ -39,18 +63,162 @@ TEST_F(TestFoo, test2)
 
 TEST_F(TestFoo, test3)
 {
-	ASSERT_ANY_THROW(format("qwerty {0}{", 1));
-	ASSERT_ANY_THROW(format("qwe {0}{ ty", 1));
-	ASSERT_ANY_THROW(format("qwe {0 ty", 1));
-	ASSERT_ANY_THROW(format("qwerty {0}}", 1));
-	ASSERT_ANY_THROW(format("qwe {0}} ty", 1));
-	ASSERT_ANY_THROW(format("qwe 0} ty", 1));
-	ASSERT_ANY_THROW(format("qwe {} ty", 1));
-	ASSERT_ANY_THROW(format("qwe {1str} ty", 1));
-	ASSERT_ANY_THROW(format("qwe {str} ty", 1));
-	ASSERT_ANY_THROW(format("qwe {10000000000000000000000000000} ty", 1));
-	ASSERT_ANY_THROW(format("one {0} one {0} {1}", "two"));
-	ASSERT_ANY_THROW(format("one {0} one {0} {1} 3", "two", "two", "two"));
+	EXPECT_THROW(
+		try
+		{
+			format("qwerty {0}{", 1);
+		}
+		catch(const MyException& e)
+		{
+			EXPECT_STREQ(e.what(), "Unbalanced number of brackets\n");
+			throw;
+		},
+		MyException
+		
+	);
+	EXPECT_THROW(
+		try
+		{
+			format("qwe {0}{ ty", 1);
+		}
+		catch(const MyException& e)
+		{
+			EXPECT_STREQ(e.what(), "Not a number");
+			throw;
+		},
+		MyException
+		
+	);
+	EXPECT_THROW(
+		try
+		{
+			format("qwe {0 ty", 1);
+		}
+		catch(const MyException& e)
+		{
+			EXPECT_STREQ(e.what(), "Not a number");
+			throw;
+		},
+		MyException
+		
+	);
+	EXPECT_THROW(
+		try
+		{
+			format("qwerty {0}}", 1);
+		}
+		catch(const MyException& e)
+		{
+			EXPECT_STREQ(e.what(), "Unbalanced number of brackets\n");
+			throw;
+		},
+		MyException
+		
+	);
+	EXPECT_THROW(
+		try
+		{
+			format(format("qwe {0}} ty", 1), 1);
+		}
+		catch(const MyException& e)
+		{
+			EXPECT_STREQ(e.what(), "Unbalanced number of brackets\n");
+			throw;
+		},
+		MyException
+		
+	);
+	EXPECT_THROW(
+		try
+		{
+			format("qwe 0} ty", 1);
+		}
+		catch(const MyException& e)
+		{
+			EXPECT_STREQ(e.what(), "Unbalanced number of brackets\n");
+			throw;
+		},
+		MyException
+		
+	);
+	EXPECT_THROW(
+		try
+		{
+			format("qwe {} ty", 1);
+		}
+		catch(const MyException& e)
+		{
+			EXPECT_STREQ(e.what(), "No index");
+			throw;
+		},
+		MyException
+		
+	);
+	EXPECT_THROW(
+		try
+		{
+			format("qwe {1str} ty", 1);
+		}
+		catch(const MyException& e)
+		{
+			EXPECT_STREQ(e.what(), "Not a number");
+			throw;
+		},
+		MyException
+		
+	);
+	EXPECT_THROW(
+		try
+		{
+			format("qwe {str} ty", 1);
+		}
+		catch(const MyException& e)
+		{
+			EXPECT_STREQ(e.what(), "Not a number");
+			throw;
+		},
+		MyException
+		
+	);
+	EXPECT_THROW(
+		try
+		{
+			format("qwe {10000000000000000000000000000} ty", 1);
+		}
+		catch(const MyException& e)
+		{
+			EXPECT_STREQ(e.what(), "Too long number");
+			throw;
+		},
+		MyException
+		
+	);
+	EXPECT_THROW(
+		try
+		{
+			format("one {0} one {0} {1}", "two");
+		}
+		catch(const MyException& e)
+		{
+			EXPECT_STREQ(e.what(), "Not enough arguments\n");
+			throw;
+		},
+		MyException
+		
+	);
+	EXPECT_THROW(
+		try
+		{
+			format("one {0} one {0} {1} 3", "two", "two", "two");
+		}
+		catch(const MyException& e)
+		{
+			EXPECT_STREQ(e.what(), "Too much arguments");
+			throw;
+		},
+		MyException
+		
+	);
 }
 
 int main(int argc, char ** argv)

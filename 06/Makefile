@@ -2,11 +2,8 @@ CC=g++
 FLAGS=-std=c++2a -Wall -pedantic -Wextra
 TEST_LIBS=-lgtest_main -lgtest -lpthread
 
-all: test format.o
-	./test
+all: test 
+	./test	
 
-format.o: format.cpp
-	$(CC) $(FLAGS) format.cpp -c	
-
-test: test.cpp format.o
+test: test.cpp
 	$(CC) $(FLAGS) test.cpp -o test $(TEST_LIBS)
