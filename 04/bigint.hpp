@@ -26,7 +26,8 @@ public:
     bigInt operator +(int);
     bigInt operator -(int);
 	
-	friend bigInt operator +(const bigInt&, const bigInt&);
-	friend bigInt operator -(const bigInt&, const bigInt&);
+	bigInt operator +(const bigInt&) const;
+	bigInt operator -(const bigInt&) const;
 	friend std::ostream & operator <<(std::ostream & out,const bigInt& obj);
+	std::string repr() const;
 };

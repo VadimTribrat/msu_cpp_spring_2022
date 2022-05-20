@@ -3,9 +3,10 @@
 
 int main()
 {
-    bigInt bi("12");
-    std::cout << bi << "\n";
-    auto new_bi = bi * bigInt("0");
-    std::cout << new_bi << "\n";
+    auto a = bigInt("12");
+    // bigInt::mul_by_int(a, 8);
+    bigInt new_bi("");
+    // new_bi = bigInt("12") + a;
+    new_bi = bigInt("12");
     return 0;
 }

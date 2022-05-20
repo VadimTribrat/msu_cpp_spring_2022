@@ -58,6 +58,25 @@ TEST_F(TestFoo, compTest)
     ASSERT_TRUE(bigInt("3787465125780") != bigInt("3787"));
 }
 
+TEST_F(TestFoo, copyMoveTest)
+{
+    auto a = bigInt("13532542");
+    auto b = bigInt("-6894726542");
+    ASSERT_TRUE(a.repr() == "13532542");
+    ASSERT_TRUE(b.repr() == "-6894726542");
+    bigInt c = bigInt("90000");
+    ASSERT_TRUE(c.repr() == "90000");
+    c = std::move(b);
+    ASSERT_TRUE(c.repr() == "-6894726542");
+    ASSERT_TRUE(b.repr() == "");
+    c = a;
+    ASSERT_TRUE(c.repr() == "13532542");
+    ASSERT_TRUE(a.repr() == "13532542");
+    auto d = c;
+    ASSERT_TRUE(d.repr() == "13532542");
+    ASSERT_TRUE(c.repr() == "13532542");
+}
+
 int main(int argc, char ** argv)
 {
 	::testing::InitGoogleTest(&argc, argv);

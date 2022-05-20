@@ -18,6 +18,8 @@ int min(int a, int b)
 
 bigInt::bigInt(std::string str)
 {
+	if (str.size() == 0)
+		str = std::string("0");
 	neg = str[0] == '-';
 	size = 0;
 	max_size = 5;
@@ -33,18 +35,18 @@ bigInt::bigInt(std::string str)
 
 bigInt::bigInt(bigInt&& other)
 {
-	arr_of_int = new int[other.max_size];
 	arr_of_int = other.arr_of_int;
 	other.arr_of_int = nullptr;
 	size = other.size;
 	neg = other.neg;
 	max_size = other.max_size;
 	other.size = other.max_size = 0;
+	other.neg = false;
 }
 
 bigInt bigInt::mul_by_int(const bigInt& bi, int d)
 {
-	bigInt new_bi("");
+	bigInt new_bi("0");
 	if (d == 0)
 		return bigInt("0");
 	for (int i = 0; i < d; ++i)
@@ -56,12 +58,14 @@ bigInt bigInt::mul_by_int(const bigInt& bi, int d)
 
 bigInt bigInt::operator=(bigInt&& other)
 {
+	delete[] arr_of_int;
 	arr_of_int = other.arr_of_int;
 	other.arr_of_int = nullptr;
 	size = other.size;
 	neg = other.neg;
 	max_size = other.max_size;
 	other.size = other.max_size = 0;
+	other.neg = false;
 	return *this;
 }
 
@@ -79,18 +83,18 @@ std::ostream & operator <<(std::ostream & out, const bigInt& obj)
 	return out;
 }
 
-bigInt operator +(const bigInt & a, const bigInt & b)
+bigInt bigInt::operator +(const bigInt & b) const
 {
 	int flag = 0;
-	int sizea = a.size-1, sizeb = b.size-1;
+	int sizea = size-1, sizeb = b.size-1;
 	int s = max(sizea, sizeb);
 	std::string str("");
-	if (!a.neg && b.neg)
-		return a-(-b);
-	else if (a.neg && !b.neg)
-		return b-(-a);
-	else if (a.neg && b.neg)
-		return -((-a) + (-b));
+	if (!neg && b.neg)
+		return *this-(-b);
+	else if (neg && !b.neg)
+		return b-(-*this);
+	else if (neg && b.neg)
+		return -((-*this) + (-b));
 	else
 	{
 		for(int i = s; i>=0; i--)
@@ -106,14 +110,14 @@ bigInt operator +(const bigInt & a, const bigInt & b)
 			}
 			if(sizeb < 0)
 			{
-				int s = a.arr_of_int[sizea];
+				int s = arr_of_int[sizea];
 				s += flag;
 				str.push_back((char)((s%10) + '0'));
 				flag = s/10;
 				sizea--;
 				continue;
 			}
-				int s = a.arr_of_int[sizea] + b.arr_of_int[sizeb];
+				int s = arr_of_int[sizea] + b.arr_of_int[sizeb];
 				s += flag;
 				str.push_back((char)((s%10) + '0'));
 				flag = s/10;
@@ -245,29 +249,29 @@ bool bigInt::operator>(const bigInt& other)const
 	return ((*this)>=other) && (*this) != other;
 }
 
-bigInt operator -(const bigInt & a, const bigInt & b)
+bigInt bigInt::operator -(const bigInt & b) const
 {
-	int sizea = a.size - 1, sizeb = b.size - 1;
+	int sizea = size - 1, sizeb = b.size - 1;
 	bigInt inc(""), dec("");
-	if (!a.neg && b.neg)
-		return a+(-b);
-	else if (a.neg && !b.neg)
-		return -(-a+b);
-	else if (a.neg && b.neg)
-		return (-b)-(-a);
+	if (!neg && b.neg)
+		return *this+(-b);
+	else if (neg && !b.neg)
+		return -(-*this+b);
+	else if (neg && b.neg)
+		return (-b)-(-*this);
 	else
 	{
 		if (sizea >= sizeb)
 		{
-			int * s = new int[a.size + 1];
+			int * s = new int[size + 1];
 			std::string str("");
-			for (long unsigned i = 0; i < a.size+1; i++)
+			for (long unsigned i = 0; i < size+1; i++)
 				s[i] = 0;
 			int mi = min(sizea, sizeb);
 			int ma = max(sizea, sizeb);
 			for (int i = 0; i <= mi; i++)
 			{
-				int temp = a.arr_of_int[sizea] - b.arr_of_int[sizeb] - s[sizea+1];
+				int temp = arr_of_int[sizea] - b.arr_of_int[sizeb] - s[sizea+1];
 				if (temp >= 0)
 					str.push_back((char)(temp + '0'));
 				else
@@ -280,7 +284,7 @@ bigInt operator -(const bigInt & a, const bigInt & b)
 			}
 			for (int i =mi+1  ; i<= ma; i++)
 			{
-				int temp = a.arr_of_int[sizea] - s[sizea + 1];
+				int temp = arr_of_int[sizea] - s[sizea + 1];
 				if (temp >= 0)
 					str.push_back((char)(temp + '0'));
 				else
@@ -307,11 +311,12 @@ bigInt operator -(const bigInt & a, const bigInt & b)
 		}
 		else
 		{
-			return -(b-a);
+			return -(b-(*this));
 		}
 	}
 			
 }
+
 bigInt bigInt::operator =(const bigInt & obj)
 {
 	if (*this == obj)
@@ -319,12 +324,14 @@ bigInt bigInt::operator =(const bigInt & obj)
 	int* newline = new int[obj.max_size];
     for (size_t i = 0; i < obj.size; i++)
 		newline[i] = obj.arr_of_int[i];
+	delete[] arr_of_int;
     arr_of_int = newline;
 	size = obj.size;
 	max_size = obj.max_size;
 	neg = obj.neg;
 	return *this;
 }
+
 bigInt bigInt::operator -()const
 {
 	bigInt temp = *this;
@@ -352,7 +359,7 @@ void bigInt::push_back(int n)
 
 bigInt bigInt::operator*(const bigInt& other)
 {
-	bigInt acc(""), bi("");
+	bigInt acc("0"), bi("0");
 	acc = bigInt::mul_by_int(*this, other.arr_of_int[other.size - 1]);
 	for (int ind = other.size - 2; ind >= 0; --ind)
 	{
@@ -380,4 +387,16 @@ bigInt bigInt::operator +(int i)
 bigInt bigInt::operator -(int i)
 {
 	return *this - std::to_string(i);
+}
+
+std::string bigInt::repr() const
+{
+	std::string str("");
+	if (neg)
+		str.push_back('-');
+	for (size_t i = 0 ; i < size; ++i)
+	{
+		str.push_back('0' + arr_of_int[i]);
+	}
+	return str;
 }
